@@ -116,3 +116,21 @@
   "saldoTipo": "entrada"
 }
 ```
+
+### Json completo
+```json
+{
+    "id": auto,
+    "context": text,
+    "valor_total": number,
+    "tipo": DIVIDA | RECORRENTE | CREDITO | DINHEIRO | DEBITO | PIX,
+    "data":YYYY/MM/DD HH:MM:SS,
+    "user_id": id,
+    "saldoTipo": ENTRADA | SAIDA,
+    "valor_parcela": number,
+    "quantidade_parcelas": number,
+    "data_pagamento": YYYY/MM/DD HH:MM:SS,
+    "parcela": number,
+    "titulo": text
+  }
+```
