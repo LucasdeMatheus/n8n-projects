@@ -1,0 +1,2729 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# whatsapp",
+        "height": 528,
+        "width": 1056
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3568,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "72ce0e7d-8336-44ac-9142-eb7d98a2d483",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v16.0/{{ $item(\"0\").$node[\"WhatsApp Trigger1\"].json[\"messages\"][\"0\"][\"image\"][\"id\"] }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -768,
+        2256
+      ],
+      "id": "bc25a0c0-5914-453c-bc9c-8bf1c2dda942",
+      "name": "download whatsapp 1",
+      "credentials": {
+        "httpBearerAuth": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBearerAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -592,
+        2256
+      ],
+      "id": "34fbe4d1-53d9-4ba9-aec3-6d935bea1db3",
+      "name": "for binary",
+      "credentials": {
+        "httpBearerAuth": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ocr.space/parse/image",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            },
+            {
+              "name": "language",
+              "value": "por"
+            },
+            {
+              "name": "OCREngine",
+              "value": "2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -416,
+        2256
+      ],
+      "id": "837c429c-4061-4038-a7a6-b376f1245e67",
+      "name": "ocr"
+    },
+    {
+      "parameters": {
+        "content": "# extrai a imagem\n",
+        "height": 384,
+        "width": 768
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -864,
+        2112
+      ],
+      "typeVersion": 1,
+      "id": "ff59251d-6198-4f2a-a746-43e4b7a6c7ac",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "transacoes",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "context",
+              "condition": "eq",
+              "keyValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].context.id }}"
+            },
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get a row').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -832
+      ],
+      "id": "3c5fba78-b7a5-485b-b251-bfa486c0b1b3",
+      "name": "Delete a row",
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger1').item.json.contacts[0].wa_id }}",
+        "textBody": "ah... :(|Se quiser, podemos tentar novamente.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        -832
+      ],
+      "id": "7ef77867-02a7-4eea-9ee1-15179f3d7c79",
+      "name": "não salva",
+      "webhookId": "6f40ab86-445f-4a67-9766-9d1092d801cd",
+      "executeOnce": true,
+      "credentials": {
+        "whatsAppApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# apaga transação",
+        "height": 384,
+        "width": 752
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        -960
+      ],
+      "typeVersion": 1,
+      "id": "1cbff01d-4cbf-4f66-9ee3-d3fc5f209406",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "tableId": "transacoes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "context",
+              "fieldValue": "={{ $json.messages[0].id }}"
+            },
+            {
+              "fieldId": "data",
+              "fieldValue": "={{ $('Edit Fields').item.json.dataHora }}"
+            },
+            {
+              "fieldId": "tipo",
+              "fieldValue": "={{ $('Edit Fields').item.json.tipo }}"
+            },
+            {
+              "fieldId": "valor_total",
+              "fieldValue": "={{ $('Edit Fields').item.json.valor }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Get a row').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        1776
+      ],
+      "id": "427af15a-5b8a-4d7b-b0c0-71a72a38c386",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# envia resultado\n",
+        "height": 384,
+        "width": 624
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -560,
+        1648
+      ],
+      "typeVersion": 1,
+      "id": "7c98895a-946b-4e96-8ed4-eb7f430afd9b",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# transação por mensagem\n",
+        "height": 320,
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1024,
+        1696
+      ],
+      "typeVersion": 1,
+      "id": "1cc5b420-a93d-499c-b2dc-ddd3f2c81f30",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json[\"ParsedResults\"][0].ParsedText;\n\n// Função helper para regex com fallback\nconst extract = (pattern) => {\n  const match = text.match(pattern);\n  return match ? match[1].trim() : null;\n};\n\n// Função helper para detectar nome\nconst extractNome = () => {\n  const nomeMatch = text.match(/(?:AUTORIZADO COM SENHA|Pagamento autorizado com senha)\\s*\\n([\\w\\sÀ-ÿ]+)/i);\n  return nomeMatch ? nomeMatch[1].trim() : null;\n};\n\nlet nome = extractNome();\n\n// Detectar tipo de transação (crédito, débito, PIX)\nlet tipo = \"DINHEIRO\";\nif (/CREDITO|CRÉDITO/i.test(text)) tipo = \"CREDITO\";\nelse if (/DEBITO|DÉBITO/i.test(text)) tipo = \"DEBITO\";\nelse if (/PIX/i.test(text)) tipo = \"PIX\";\n\n// Data/hora no formato dd/MM/yyyy HH:mm\n// Data/hora no formato ISO para Supabase\nlet dataHora = extract(/(\\d{2}\\/\\d{2}\\/\\d{2,4}\\s*\\d{2}[:\\s]\\d{2})/i);\n\nif (dataHora) {\n  const parts = dataHora.match(/(\\d{2})\\/(\\d{2})\\/(\\d{2,4})\\s*(\\d{2})[:\\s](\\d{2})/);\n  if (parts) {\n    const dia = parts[1];\n    const mes = parts[2];\n    const ano = parts[3].length === 2 ? '20' + parts[3] : parts[3]; // transforma 25 em 2025\n    const hora = parts[4];\n    const min = parts[5];\n    // muda para ISO\n    dataHora = `${ano}-${mes}-${dia} ${hora}:${min}:00`;\n  }\n}\n\n\n// Valor: prioriza \"VALOR PAGO / A PAGAR / TOTAL\"\nlet valor = null;\nconst regexValorPrioritario = /(VALOR\\s*(?:PAGO|A\\s*PAGAR|TOTAL)[^\\d]*(\\d+[\\.,]\\d{2}))/i;\nconst matchPrioritario = text.match(regexValorPrioritario);\n\nif (matchPrioritario) {\n  valor = matchPrioritario[2].replace(',', '.');\n} else {\n  valor = extract(/R\\$\\s*([\\d.,]+)/);\n  if (valor) valor = valor.replace(',', '.');\n}\n\n// Parcelas: procura se tem \"2x\", \"3x\" etc.\nconst parcelas = text.match(/(\\d+)[xX]/);\nif (parcelas && valor) {\n  valor = `${valor} (${parcelas[1]}x)`;\n}\n\n// Monta resultado no formato pedido\nconst resultado = {\n  nome: nome || null,\n  dataHora,\n  valor,\n  tipo\n};\n\nreturn [\n  { json: resultado }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        2256
+      ],
+      "id": "efc9b177-0159-49fb-b85d-c39cf5fb929c",
+      "name": "regex 2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        1776
+      ],
+      "id": "ff0a174c-123f-45ac-9dc3-58b870286093",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "",
+        "recipientPhoneNumber": "={{ $node[\"WhatsApp Trigger1\"].json[\"contacts\"][\"0\"][\"wa_id\"] }}",
+        "textBody": "={{ $json.mensagem }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        1136
+      ],
+      "id": "0ac53db3-5aae-4c6a-8c29-37af2e6758b8",
+      "name": "compras do dia",
+      "webhookId": "6f40ab86-445f-4a67-9766-9d1092d801cd",
+      "credentials": {
+        "whatsAppApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# compras do dia",
+        "height": 320,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1296,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "8fd52ab5-2a09-4ac7-9daa-962cf39c539c",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# envia as compras",
+        "height": 464,
+        "width": 896
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2112,
+        896
+      ],
+      "typeVersion": 1,
+      "id": "ee45ea95-29b4-47cc-a82e-6c592db9e5f0",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Supondo que os dados vêm do nó anterior como array\nconst transacoes = $items(); // pega todos os itens da execução anterior\n\nlet mensagem = \"Compras feitas:\\n\\n\";\nlet total = 0;\n\ntransacoes.forEach(item => {\n  const t = item.json;\n\n  // Normaliza o valor: troca vírgula por ponto e converte para número\n  const valorNumerico = parseFloat(String(t.valor).replace(',', '.')) || 0;\n  total += valorNumerico;\n\n  mensagem += `Data: ${t.data}\\n`;\n  mensagem += `Valor: R$ ${t.valor_total}\\n`;\n  mensagem += `Forma de pagamento: ${t.tipo}\\n\\n`;\n});\n\n\nreturn [\n  { json: { mensagem } }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2544,
+        1136
+      ],
+      "id": "45961e4f-35f7-47b8-8a39-d2735173c6d1",
+      "name": "monta a mensagem"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data",
+              "condition": "gt",
+              "keyValue": "={{\n(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T00:00:00`;\n})();\n\n\n}}"
+            },
+            {
+              "keyName": "data",
+              "condition": "lt",
+              "keyValue": "={{(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T23:59:59`;\n})();}}"
+            },
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get a row').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        560
+      ],
+      "id": "4512c88d-6a91-472e-b023-9cf15792e0d4",
+      "name": "pega compras do dia",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data",
+              "condition": "gt",
+              "keyValue": "={{ (() => {\n  const d = new Date();\n  const ano = d.getFullYear();\n  const mes = String(d.getMonth() + 1).padStart(2, '0');\n  return `${ano}-${mes}-01T00:00:00`;\n})() }}"
+            },
+            {
+              "keyName": "data",
+              "condition": "lt",
+              "keyValue": "={{ (() => {\n  const d = new Date();\n  const ano = d.getFullYear();\n  const mes = d.getMonth() + 1; // número do mês\n  const ultimoDia = new Date(ano, mes, 0).getDate(); // calcula último dia do mês\n  const mesStr = String(mes).padStart(2, '0');\n  return `${ano}-${mesStr}-${ultimoDia}T23:59:59`;\n})() }}"
+            },
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get a row').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        1328
+      ],
+      "id": "f9cd8501-a8b8-441d-8c86-f5f13d9a72cd",
+      "name": "pega compras do mês",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3472,
+        1280
+      ],
+      "id": "4adcbf65-9639-4446-a5ae-99d637f62265",
+      "name": "WhatsApp Trigger1",
+      "webhookId": "c2eb48e2-c410-4a3e-a79d-ceb7447a5976",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "62ae828b-e8c0-414f-9b65-9ae24fd50b05",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d7001d75-a3b8-4a49-85d6-98e8dbaadff2",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].text.body }}",
+                    "rightValue": "=\\b(reais|dinheiro|pix|credito|debito|\\$)\\b|\\d{1,3}(?:[\\.,]\\d{2})?",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].image }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "279492bd-4db6-4d82-bb8b-68419304d2a1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7f0434af-ef74-46f1-b951-4a09b9467d57",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2352,
+        1264
+      ],
+      "id": "a8545178-f4f4-4468-84a6-9b6eab6b7ffb",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "50cb36f0-a594-45c3-a1f1-e7b05e0cdc2b",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "fd400421-e8d0-4dae-b14f-14bfdb70c36c",
+              "leftValue": "={{ $json.role }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2816,
+        1280
+      ],
+      "id": "ec47d862-ed14-4b0c-9297-9054bd94637c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0//messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAQV8fWy0IIBPWeuTxubP5MpzOM192tEwtfZBpnZAS7VGTO81xpz7zXXloUdm03HDWbepDGx4DsPOwIRv5glckPXQ6UggTpHwPFtVQEFlQQxgUKLuJwPVhnw2bRQUgpyFuNkttU15uNgQ3ZBcDBmZBit1ccL8op6ZCRNnO5JnQUsG3S582vT3hZC83U8MCKkhdLG0IaFDZCgZBmyd2mkue5rgDQyoojfRM2IoFoePxcMgZAYZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"recipient_type\": \"individual\", \"to\": \"{{ $('WhatsApp Trigger1').item.json.contacts[0].wa_id }}\", \"type\": \"interactive\", \"interactive\": { \"type\": \"cta_url\", \"header\": { \"type\": \"text\", \"text\": \"🚀 Bem-vindo ao nosso Sistema Financeiro SaaS\" }, \"body\": { \"text\": \"Faça seu cadastro agora mesmo e tenha acesso ao painel completo de gestão!\" }, \"action\": { \"name\": \"cta_url\", \"parameters\": { \"display_text\": \"📌 Fazer Cadastro\", \"url\": \"https://backoffice.com/cadastro\" } }, \"footer\": { \"text\": \"🔒 Seu acesso é seguro e exclusivo.\" } } }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2368,
+        896
+      ],
+      "id": "9cf3c2d5-dd4d-45c2-8d32-5dbe37cc7deb",
+      "name": "setup",
+      "credentials": {
+        "httpBearerAuth": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0//messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $('WhatsApp Trigger1').item.json.contacts[0].wa_id }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Resumo da Transação\"\n    },\n    \"body\": {\n      \"text\": \"Valor: {{ $json.valor }}\\nData e hora: {{ $json.dataHora }}\\nForma de pagamento: {{ $json.tipo }}\"\n    },\n    \"footer\": {\n      \"text\": \"O que deseja fazer?\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"transacao_excluir\",\n            \"title\": \"Apagar Transação\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"transacao_gasto\",\n            \"title\": \"Definir como Saída\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"transacao_ganho\",\n            \"title\": \"Definir como Entrada\"\n          }\n        }\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -256,
+        1776
+      ],
+      "id": "f490f7bd-efd8-4bd7-a935-de147839e2b2",
+      "name": "envia dados da transação",
+      "credentials": {
+        "httpBearerAuth": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51239430-b5b7-4f62-8176-c38ba4dc25d4",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        1168
+      ],
+      "id": "a84f922a-2562-4726-842d-249137738493",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "transacoes",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "context",
+              "condition": "eq",
+              "keyValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].context.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "saldoTipo",
+              "fieldValue": "saida"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        -480
+      ],
+      "id": "5a6edd59-132a-4b64-a5ec-ba0bd49f21e0",
+      "name": "Update a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "transacoes",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "context",
+              "condition": "eq",
+              "keyValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].context.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "saldoTipo",
+              "fieldValue": "entrada"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        -96
+      ],
+      "id": "37cfe565-5aaf-4105-85cd-400d54ead5a0",
+      "name": "Update a row2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger1').item.json.contacts[0].wa_id }}",
+        "textBody": "Transação definida como *Entrada*",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        -96
+      ],
+      "id": "074c714d-720d-4472-a000-c7a9e9879b56",
+      "name": "definida como entrada",
+      "webhookId": "6f40ab86-445f-4a67-9766-9d1092d801cd",
+      "credentials": {
+        "whatsAppApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger1').item.json.contacts[0].wa_id }}",
+        "textBody": "Transação definida como *Saída*",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        -480
+      ],
+      "id": "fe7fa508-96e7-48b7-ac9d-c76ce7e156e7",
+      "name": "definida como saida",
+      "webhookId": "6f40ab86-445f-4a67-9766-9d1092d801cd",
+      "credentials": {
+        "whatsAppApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# saída",
+        "height": 288,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1216,
+        -528
+      ],
+      "typeVersion": 1,
+      "id": "c7153216-420b-4c27-923b-95344890115d",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "# entrada",
+        "height": 288,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1216,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "f14fe57f-b384-4aed-ac6b-170e32f76e67",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 19
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3440,
+        -176
+      ],
+      "id": "f1193f22-719b-45d5-b81c-b3cef6953237",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const transacoes = $items(); // pega todos os itens da execução anterior\n\n// Agrupa por user_id\nconst porUsuario = {};\ntransacoes.forEach(item => {\n  const t = item.json;\n  if (!porUsuario[t.user_id]) porUsuario[t.user_id] = [];\n  porUsuario[t.user_id].push(t);\n});\n\nconst mensagens = [];\n\nfor (const userId in porUsuario) {\n  const lista = porUsuario[userId];\n  let totalEntrada = 0;\n  let totalSaida = 0;\n\n  lista.forEach(t => {\n    const valor = parseFloat(String(t.valor_total).replace(',', '.')) || 0;\n    if (t.saldoTipo === 'entrada') totalEntrada += valor;\n    else totalSaida += valor;\n  });\n\n  const saldoFinal = totalEntrada - totalSaida;\n\n  // Monta mensagem resumida\n  const texto = `💰 Resumo do diaa:\\n\\nTotal Entrada: R$ ${totalEntrada.toFixed(2)}\\nTotal Saída: R$ ${totalSaida.toFixed(2)}\\nSaldo Final: R$ ${saldoFinal.toFixed(2)}`;\n\n  // Cria estrutura de mensagem interativa (botões)\n  const msgInteractive = {\n    json: {\n      user_id: userId,\n      interactiveMessage: {\n        type: \"button\",\n        header: {\n          type: \"text\",\n          text: \"📊 Resumo Financeiro\"\n        },\n        body: {\n          text: texto\n        },\n        footer: {\n          text: \"Escolha uma ação\"\n        },\n        action: {\n          buttons: [\n            {\n              type: \"reply\",\n              reply: {\n                id: \"ver_transacoes\",\n                title: \"Ver Transações\"\n              }\n            \n            }\n          ]\n        }\n      }\n    }\n  };\n\n  mensagens.push(msgInteractive);\n}\n\nreturn mensagens;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2752,
+        -160
+      ],
+      "id": "f6f5b789-e45b-4cb6-8763-cc67209dc943",
+      "name": "monta a mensagem1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51239430-b5b7-4f62-8176-c38ba4dc25d4",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3024,
+        -176
+      ],
+      "id": "53cdbc66-4a04-4c6c-a786-c1bb8dd73e3a",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "user",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2544,
+        -160
+      ],
+      "id": "7130222c-bb50-43e1-809b-8231775193ab",
+      "name": "Get a row1",
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Envia resumo do dia ás 19h",
+        "height": 384,
+        "width": 1744
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3552,
+        -288
+      ],
+      "typeVersion": 1,
+      "id": "f7ceed47-dd93-47fe-bc82-827bc7716250",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0//messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $json.waid }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {{ JSON.stringify($item(\"0\").$node[\"monta a mensagem1\"].json[\"interactiveMessage\"]) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2320,
+        -160
+      ],
+      "id": "5f51ec1c-4d39-4fac-890f-fb042d027e72",
+      "name": "setup1",
+      "credentials": {
+        "httpBearerAuth": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "resumos",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "context",
+              "fieldValue": "={{ $json.messages[0].id }}"
+            },
+            {
+              "fieldId": "tipo",
+              "fieldValue": "dia"
+            },
+            {
+              "fieldId": "data",
+              "fieldValue": "={{ $now.toISODate() }}\n"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('monta a mensagem1').item.json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2112,
+        -160
+      ],
+      "id": "ef88f97e-7e88-4a33-9fbb-06fba39b09b0",
+      "name": "instancia o resumo",
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data",
+              "condition": "gte",
+              "keyValue": "={{\n(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T00:00:00`;\n})();\n\n\n}}"
+            },
+            {
+              "keyName": "data",
+              "condition": "lt",
+              "keyValue": "={{(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T23:59:59`;\n})();}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3216,
+        -176
+      ],
+      "id": "893fbdad-612d-465f-bc7f-648bb6fe573e",
+      "name": "pega as transações do dia",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "user",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "waid",
+              "keyValue": "={{ $json.contacts[0].wa_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3120,
+        1280
+      ],
+      "id": "f106467c-f9b2-4ed1-923c-5e5854e7293d",
+      "name": "Get a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "resumos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "context",
+              "keyValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].context.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        1776
+      ],
+      "id": "fb360083-ded3-4a5d-96dd-8cab64ce2e5a",
+      "name": "Get a row2",
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data",
+              "condition": "gte",
+              "keyValue": "={{ $item(\"0\").$node[\"Get a row2\"].json[\"data\"].split(\"T\")[0] + \"T00:00:00\" }}"
+            },
+            {
+              "keyName": "data",
+              "condition": "lte",
+              "keyValue": "={{ $item(\"0\").$node[\"Get a row2\"].json[\"data\"].split(\"T\")[0] + \"T23:59:59\" }}"
+            },
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        1776
+      ],
+      "id": "3581bbdc-2e01-404d-b45b-924399de1f30",
+      "name": "pega compras do dia1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# ver transações do resumo diario",
+        "height": 336,
+        "width": 512
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        1632
+      ],
+      "typeVersion": 1,
+      "id": "b4b710a0-4c0d-4064-844d-0075c9dc460e",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# compras do mês",
+        "height": 336,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1296,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "2ac2c4fc-16f4-4590-91cb-e029ebf5a68b",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger1').item.json.contacts[0].wa_id }}",
+        "textBody": "Nenhuma transação registrada.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        960
+      ],
+      "id": "49e8c737-5acb-4681-81c3-03a5f812a303",
+      "name": "nenhuma transação",
+      "webhookId": "41cbd293-bce7-47a4-aa57-36dcc160248f",
+      "credentials": {
+        "whatsAppApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7f82d3f2-1602-450d-8a67-37c232abbf37",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "transacao",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d2ddc900-7f1d-40b2-9c83-14eb6a1d336d",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "extrato",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a706fb96-403d-49b3-84e4-3520f5ec5608",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "ver_transacoes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -320,
+        720
+      ],
+      "id": "9d663432-f5c3-4901-8db1-0c641297d29b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega o texto recebido do WhatsApp\nconst texto = $item(0).$node[\"WhatsApp Trigger1\"].json[\"messages\"][0][\"text\"][\"body\"];\n\n// === Função para formatar data/hora no estilo ISO (YYYY-MM-DD HH:MM:SS) em GMT-3 ===\nfunction formatDataHoraBrasilISO() {\n  const now = new Date();\n\n  // Converte para UTC e aplica -3h (Brasília)\n  const utc = now.getTime() + now.getTimezoneOffset() * 60000;\n  const brasil = new Date(utc - 3 * 60 * 60 * 1000);\n\n  // Retorna formato aceito pelo Supabase\n  const pad = (n) => n.toString().padStart(2, \"0\");\n  return `${brasil.getFullYear()}-${pad(brasil.getMonth() + 1)}-${pad(brasil.getDate())} ${pad(brasil.getHours())}:${pad(brasil.getMinutes())}:${pad(brasil.getSeconds())}`;\n}\n\n// Data/hora atual em Brasília no formato ISO\nconst dataHora = formatDataHoraBrasilISO();\n\n// === Extrai valor numérico ===\nconst valorMatch = texto.match(/(\\d+[,.]?\\d*)/);\nlet valor = valorMatch ? valorMatch[0].replace(\",\", \".\") : null;\n\n// === Detecta o tipo de pagamento ===\nconst tiposValidos = [\"pix\", \"credito\", \"debito\"];\nlet tipo = \"DINHEIRO\"; // padrão se não encontrar nada\n\nfor (const t of tiposValidos) {\n  if (texto.toLowerCase().includes(t)) {\n    tipo = t.toUpperCase();\n    break;\n  }\n}\n\n// === Monta objeto de resultado ===\nconst resultado = {\n  nome: null, // futuramente dá pra preencher com OCR ou nome do contato\n  dataHora,\n  valor,\n  tipo,\n};\n\n// Retorna para o n8n\nreturn [{ json: resultado }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        1840
+      ],
+      "id": "d919d1de-6dbf-4170-a4b0-957c37c2b4e0",
+      "name": "regex"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "transacao_excluir",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d1b91239-a337-4673-a35d-b58799afa267"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0aaa5065-701b-4621-8c0c-f8ee9a02116a",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "transacao_gasto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7f82d3f2-1602-450d-8a67-37c232abbf37",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "transacao_ganho",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        -432
+      ],
+      "id": "fa41ec63-8772-45c3-ba87-24b966af9bf0",
+      "name": "transaçao"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 912,
+        "width": 1200,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1072,
+        1616
+      ],
+      "typeVersion": 1,
+      "id": "f20bb79d-303d-4499-b655-1072f111836b",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 1200,
+        "width": 1024,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1008,
+        -1024
+      ],
+      "typeVersion": 1,
+      "id": "5755e377-ce48-4394-abb5-c1d5d676412e",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "consultar_extrato",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f407d92e-97a2-471a-b2b6-e0ccd6893eb9"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7bc9a98c-2a9e-4bd8-a605-ab03a8509362",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "extrato_dia",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ab1593f5-2ad6-4283-92ba-945b72619c61",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "extrato_semana",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c81e7781-bbf7-4b00-beee-c04fd8789c93",
+                    "leftValue": "={{ $('WhatsApp Trigger1').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "extrato_mes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        800,
+        1104
+      ],
+      "id": "b1db0d6d-3990-4e46-8c16-f8c967ce312c",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data",
+              "condition": "gt",
+              "keyValue": "={{ (() => { const d = new Date(); d.setDate(d.getDate() - 7); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T00:00:00`; })() }}"
+            },
+            {
+              "keyName": "data",
+              "condition": "lt",
+              "keyValue": "={{ (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T23:59:59`; })() }}"
+            },
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $item(\"0\").$node[\"Get a row\"].json[\"id\"] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        928
+      ],
+      "id": "1fca7122-8cbf-4101-86c5-a230b65e731b",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# compras da semana",
+        "height": 336,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1296,
+        800
+      ],
+      "typeVersion": 1,
+      "id": "03f98e2c-3787-44c1-ac18-230902d6072d",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 1920,
+        "width": 928,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        992,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "67ed9245-e783-4be5-9a2f-a9a67fbc604d",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0//messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $('WhatsApp Trigger1').item.json.contacts[0].wa_id }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"💰 Menu Financeiro\"\n    },\n    \"body\": {\n      \"text\": \"Você pode:\\n\\n📷 Enviar uma notinha para OCR\\n💸 Enviar uma transação rápida (ex: digite *25*)\\n📄 Consultar seu extrato\"\n    },\n    \"footer\": {\n      \"text\": \"🔒 Seu acesso é seguro e exclusivo.\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"consultar_extrato\",\n            \"title\": \"📄 Consultar Extrato\"\n          }\n        }\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2464,
+        1600
+      ],
+      "id": "a277e55f-bd20-40a3-a323-fa5555878a89",
+      "name": "menu",
+      "credentials": {
+        "httpBearerAuth": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0//messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $('WhatsApp Trigger1').item.json.contacts[0].wa_id }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"📊 Relatório Financeiro\"\n    },\n    \"body\": {\n      \"text\": \"Escolha uma opção para gerar o relatório:\"\n    },\n    \"footer\": {\n      \"text\": \"🔒 Seu acesso é seguro e exclusivo.\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"extrato_dia\",\n            \"title\": \"Dia\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"extrato_semana\",\n            \"title\": \"Semana\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"extrato_mes\",\n            \"title\": \"Mês\"\n          }\n        }\n        \n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1056,
+        608
+      ],
+      "id": "e1f784ee-419b-45e6-8732-dfa85ab27d65",
+      "name": "opções de extrato",
+      "credentials": {
+        "httpBearerAuth": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "user",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $item(\"0\").$node[\"Get a row\"].json[\"id\"] }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "context_message",
+              "fieldValue": "={{null}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        -832
+      ],
+      "id": "e8ea981a-ada5-40e8-8170-c3a228fbbc69",
+      "name": "Update a row10",
+      "executeOnce": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 736,
+        "width": 1376,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1920,
+        768
+      ],
+      "typeVersion": 1,
+      "id": "64145876-c36e-436d-9bc0-1cea1cad46e3",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3648,
+        432
+      ],
+      "id": "70e47407-46be-40a0-ba64-b2ca08b7f0b6",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dividasHoje = $items(\"LISTA DIVIDAS PARA HOJE\");\nconst recorrentesHoje = $items(\"LISTA DIVIDAS RECORRENTE DE HOJE\");\n\nconst resultados = [];\n\n// Agrupa por user_id\nconst porUsuario = {};\n\n[...dividasHoje, ...recorrentesHoje].forEach(item => {\n  const t = item.json;\n  if (!t || !t.user_id) return; // ignora itens inválidos\n  if (!porUsuario[t.user_id]) porUsuario[t.user_id] = { normais: [], recorrentes: [] };\n\n  if (t.tipo === 'RECORRENTE') porUsuario[t.user_id].recorrentes.push(t);\n  else porUsuario[t.user_id].normais.push(t);\n});\n\nfor (const userId in porUsuario) {\n  const { normais, recorrentes } = porUsuario[userId];\n\n  // Monta body já formatado para WhatsApp\n  let bodyTexto = '';\n\n  if (normais.length > 0) {\n    bodyTexto += '📌 Dívidas Normais:\\n';\n    normais.forEach(d => {\n      const valorExibir = (d.valor_parcela != null) ? parseFloat(d.valor_parcela).toFixed(2) : parseFloat(d.valor_total).toFixed(2);\n      bodyTexto += `• ${d.titulo}: R$ ${valorExibir}\\n`;\n    });\n    bodyTexto += '\\n';\n  }\n\n  if (recorrentes.length > 0) {\n    bodyTexto += '📌 Dívidas Recorrentes:\\n';\n    recorrentes.forEach(d => {\n      bodyTexto += `• ${d.titulo}: R$ ${parseFloat(d.valor_total).toFixed(2)}\\n`;\n    });\n  }\n\n  // Remove quebras de linha extras no final\n  bodyTexto = bodyTexto.trim();\n\n  resultados.push({\n    user_id: userId,\n    body: bodyTexto\n  });\n}\n\nreturn resultados;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2736,
+        384
+      ],
+      "id": "c88dcc97-9f80-4a6c-b33b-e0f4909a9aaa",
+      "name": "monta a mensagem2",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51239430-b5b7-4f62-8176-c38ba4dc25d4",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3008,
+        368
+      ],
+      "id": "d26a2a5a-b2a3-43ff-a00e-efb6370623e6",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "user",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2288,
+        416
+      ],
+      "id": "86fb5b16-9dcd-447f-b220-b541fdfe8a03",
+      "name": "Get a row3",
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Envia lembretes todo dia ás 8h",
+        "height": 512,
+        "width": 2176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3760,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "da26c3c5-211b-42f9-951e-df3e6082976c",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "tableId": "resumos",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "context",
+              "fieldValue": "={{ $json.messages[0].id }}"
+            },
+            {
+              "fieldId": "tipo",
+              "fieldValue": "dia"
+            },
+            {
+              "fieldId": "data",
+              "fieldValue": "={{ $now.toISODate() }}\n"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('monta a mensagem2').item.json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        416
+      ],
+      "id": "32148d45-59f9-4ac6-904f-7eeade2437b9",
+      "name": "instancia o resumo1",
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data_pagamento",
+              "condition": "gte",
+              "keyValue": "={{\n(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T00:00:00`;\n})();\n\n\n}}"
+            },
+            {
+              "keyName": "data_pagamento",
+              "condition": "lt",
+              "keyValue": "={{(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T23:59:59`;\n})();}}"
+            },
+            {
+              "keyName": "tipo",
+              "condition": "eq",
+              "keyValue": "DIVIDA"
+            },
+            {
+              "keyName": "saldoTipo",
+              "condition": "eq",
+              "keyValue": "SAIDA"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3392,
+        368
+      ],
+      "id": "fdd28b73-9fed-4969-8cee-3076b7cac54d",
+      "name": "LISTA DIVIDAS PARA HOJE",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data_pagamento",
+              "condition": "gte",
+              "keyValue": "={{\n(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T00:00:00`;\n})();\n\n\n}}"
+            },
+            {
+              "keyName": "data_pagamento",
+              "condition": "lt",
+              "keyValue": "={{(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T23:59:59`;\n})();}}"
+            },
+            {
+              "keyName": "tipo",
+              "condition": "eq",
+              "keyValue": "RECORRENTE"
+            },
+            {
+              "keyName": "saldoTipo",
+              "condition": "eq",
+              "keyValue": "SAIDA"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3184,
+        368
+      ],
+      "id": "2d11737c-0a35-44fe-9b6a-951f1597aee3",
+      "name": "LISTA DIVIDAS RECORRENTE DE HOJE",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const dividasHoje = ($items(\"LISTA DIVIDAS PARA HOJE1\") || []).filter(i => i.json);\nconst recorrentesHoje = ($items(\"LISTA DIVIDAS RECORRENTE DE HOJE1\") || []).filter(i => i.json);\n\nconst resultados = [];\n\n// Agrupa por user_id\nconst porUsuario = {};\n\n// Junta todas as dívidas de entrada (pessoas que te devem)\n[...dividasHoje, ...recorrentesHoje].forEach(item => {\n  const t = item.json;\n  if (!t || !t.user_id) return; // ignora itens inválidos\n  if (t.saldoTipo !== 'ENTRADA') return; // pega apenas quem deve ao usuário\n\n  if (!porUsuario[t.user_id]) porUsuario[t.user_id] = { dividas: [] };\n  porUsuario[t.user_id].dividas.push(t);\n});\n\nfor (const userId in porUsuario) {\n  const { dividas } = porUsuario[userId];\n\n  let bodyTexto = '';\n\n  if (dividas.length > 0) {\n    bodyTexto += '📌 Dívidas a Receber:\\n';\n    dividas.forEach(d => {\n      // Se tiver valor_parcela definido, usa ele; senão usa valor_total\n      const valorExibir = (d.valor_parcela != null) ? parseFloat(d.valor_parcela).toFixed(2) : parseFloat(d.valor_total).toFixed(2);\n      bodyTexto += `• ${d.titulo}: R$ ${valorExibir}\\n`;\n    });\n  } else {\n    bodyTexto = 'Você não possui dívidas a receber hoje.';\n  }\n\n  resultados.push({\n    user_id: userId,\n    dividas: dividas,\n    body: bodyTexto.trim()\n  });\n}\n\nreturn resultados;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2768,
+        592
+      ],
+      "id": "b78f689e-7c54-4d14-b9cf-a88b84954ce0",
+      "name": "monta a mensagem3",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51239430-b5b7-4f62-8176-c38ba4dc25d4",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "67c1d63e-90b6-4e81-a827-0b23bc32e9af",
+              "leftValue": "={{ $item(\"0\").$node[\"LISTA DIVIDAS PARA HOJE1\"].json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3008,
+        544
+      ],
+      "id": "f491549d-8f5b-408d-a90a-743a44c61568",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data_pagamento",
+              "condition": "gte",
+              "keyValue": "={{\n(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T00:00:00`;\n})();\n\n\n}}"
+            },
+            {
+              "keyName": "data_pagamento",
+              "condition": "lt",
+              "keyValue": "={{(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T23:59:59`;\n})();}}"
+            },
+            {
+              "keyName": "tipo",
+              "condition": "eq",
+              "keyValue": "DIVIDA"
+            },
+            {
+              "keyName": "saldoTipo",
+              "condition": "eq",
+              "keyValue": "ENTRADA"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3392,
+        544
+      ],
+      "id": "9faecd1e-c234-4eba-88a6-ce37df1d8131",
+      "name": "LISTA DIVIDAS PARA HOJE1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "transacoes",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "data_pagamento",
+              "condition": "gte",
+              "keyValue": "={{\n(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T00:00:00`;\n})();\n\n\n}}"
+            },
+            {
+              "keyName": "data_pagamento",
+              "condition": "lt",
+              "keyValue": "={{(() => {\n  const d = new Date();\n  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T23:59:59`;\n})();}}"
+            },
+            {
+              "keyName": "tipo",
+              "condition": "eq",
+              "keyValue": "RECORRENTE"
+            },
+            {
+              "keyName": "saldoTipo",
+              "condition": "eq",
+              "keyValue": "ENTRADA"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3184,
+        544
+      ],
+      "id": "4890bbeb-3f3c-4679-9831-7532c82be7ac",
+      "name": "LISTA DIVIDAS RECORRENTE DE HOJE1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "",
+        "recipientPhoneNumber": "={{ String($json.waid).replace(/\\D/g,'') }}",
+        "textBody": "={{ $('Edit Fields1').item.json.body }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -2112,
+        416
+      ],
+      "id": "3fd04659-ed98-4447-9a40-c666ae51ba39",
+      "name": "compras do dia1",
+      "webhookId": "6f40ab86-445f-4a67-9766-9d1092d801cd",
+      "credentials": {
+        "whatsAppApi": {
+          
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ba89a598-7f29-4c78-b525-a098f6e879b7",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "26a8adba-848d-489c-8aa6-e370ef9b0a3f",
+              "name": "user_id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2480,
+        416
+      ],
+      "id": "416e27ec-4261-4480-9a6c-ee9a5dec6491",
+      "name": "Edit Fields1"
+    }
+  ],
+  "connections": {
+    "download whatsapp 1": {
+      "main": [
+        [
+          {
+            "node": "for binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "for binary": {
+      "main": [
+        [
+          {
+            "node": "ocr",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ocr": {
+      "main": [
+        [
+          {
+            "node": "regex 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a row": {
+      "main": [
+        [
+          {
+            "node": "não salva",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "não salva": {
+      "main": [
+        [
+          {
+            "node": "Update a row10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        []
+      ]
+    },
+    "regex 2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "envia dados da transação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "monta a mensagem": {
+      "main": [
+        [
+          {
+            "node": "compras do dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pega compras do dia": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pega compras do mês": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "regex",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "download whatsapp 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "setup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envia dados da transação": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "nenhuma transação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "monta a mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "definida como saida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row2": {
+      "main": [
+        [
+          {
+            "node": "definida como entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "pega as transações do dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "monta a mensagem1": {
+      "main": [
+        [
+          {
+            "node": "Get a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "monta a mensagem1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row1": {
+      "main": [
+        [
+          {
+            "node": "setup1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setup1": {
+      "main": [
+        [
+          {
+            "node": "instancia o resumo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pega as transações do dia": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row2": {
+      "main": [
+        [
+          {
+            "node": "pega compras do dia1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pega compras do dia1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "transaçao",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a row2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "regex": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "transaçao": {
+      "main": [
+        [
+          {
+            "node": "Delete a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update a row2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "opções de extrato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "pega compras do dia",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "pega compras do mês",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "LISTA DIVIDAS PARA HOJE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LISTA DIVIDAS PARA HOJE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "monta a mensagem2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "monta a mensagem2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row3": {
+      "main": [
+        [
+          {
+            "node": "compras do dia1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LISTA DIVIDAS PARA HOJE": {
+      "main": [
+        [
+          {
+            "node": "LISTA DIVIDAS RECORRENTE DE HOJE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LISTA DIVIDAS RECORRENTE DE HOJE": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "monta a mensagem3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [],
+        [
+          {
+            "node": "monta a mensagem3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LISTA DIVIDAS PARA HOJE1": {
+      "main": [
+        [
+          {
+            "node": "LISTA DIVIDAS RECORRENTE DE HOJE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LISTA DIVIDAS RECORRENTE DE HOJE1": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "compras do dia1": {
+      "main": [
+        [
+          {
+            "node": "instancia o resumo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Get a row3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "65ba666636bd2cc228b70b8338fd5943343fbce2809278da6f3eb747179ed998"
+  }
+}
