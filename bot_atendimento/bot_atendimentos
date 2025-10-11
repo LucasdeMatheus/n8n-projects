@@ -1,0 +1,2363 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        64
+      ],
+      "id": "33a40028-63ea-421f-bd6f-153b12e63e18",
+      "name": "WhatsApp Trigger",
+      "webhookId": "a6d8f49f-0c4f-49f9-a4a0-989179e93be7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=prompt",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        960
+      ],
+      "id": "13bd04d8-7175-4aaf-97eb-3555f8717150",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Trabalhe com essa tabela para buscar informações",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "topK": 200,
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        2144,
+        1184
+      ],
+      "id": "29f3c31f-f1f1-4405-84f9-2d90cdcd006c",
+      "name": "Supabase Vector Store"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        1344
+      ],
+      "id": "d771dcdf-9acc-474e-aed5-9703f62a71e4",
+      "name": "Embeddings Google Gemini"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        880
+      ],
+      "id": "b589743a-ca3d-4e9c-a42f-9da281c854d2",
+      "name": "Supabase Vector Store1"
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        1072
+      ],
+      "id": "0e9fcdf7-8602-4c08-b304-d5e42ff62e08",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 2500,
+        "chunkOverlap": 250,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        1312
+      ],
+      "id": "9a12c475-e6e5-4717-84b7-17e20f583494",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/data/cardapio2.csv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        928
+      ],
+      "id": "df0dbbbe-50fb-4636-a627-af507e4aef88",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        912
+      ],
+      "id": "8aa1988a-641e-4909-a9e1-cdba9367318a",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        1104
+      ],
+      "id": "fe3182bf-2829-4f98-b626-7e4c75496f95",
+      "name": "Embeddings Google Gemini1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        1136
+      ],
+      "id": "15a0b8fd-3992-4660-9ccc-1848d2cc336d",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "a0ebd4c3-48b0-4991-aa38-4d246ff36687"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7b620661-839a-4665-aed3-eb7c650e6421",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "btn_menu_principal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3eb157ca-924f-47ad-89f6-73d3a4ff64d1",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "btn_menu_principal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5384af62-6220-4786-92a7-19d5e8b623fe",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        656,
+        -48
+      ],
+      "id": "5d7db7b3-2d6f-494d-9726-bd97ea1ef8d8",
+      "name": "trata casos de interação e status"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega mensagem de texto ou transcrição de áudio\nlet msg = undefined;\n\n// Checa se chegou mensagem de texto do WhatsApp\nif ($('WhatsApp Trigger').length && $('WhatsApp Trigger').first().json.messages) {\n    const firstMsg = $('WhatsApp Trigger').first().json.messages[0];\n    if (firstMsg.text && firstMsg.text.body) {\n        msg = firstMsg.text.body.toLowerCase();\n    }\n}\n\n// Se não tiver texto, tenta pegar do HTTP Request9\nif (!msg && $('HTTP Request9').length && $('HTTP Request9').first().json.data) {\n    msg = $('HTTP Request9').first().json.data.toLowerCase();\n}\n\n// Se ainda não tiver nada, define uma mensagem padrão\nif (!msg) msg = \"\";\n\n// Agora aplica as respostas\nlet respostas = [];\n\n// Grupo 1: oi/olá/eai\nif (/(oi+|ol[aá]+|eai)/.test(msg)) {\n  respostas.push(\"👋 Olá! Seja bem-vindo(a) ao ESTABELECIMENTO.\");\n}\n\n// Grupo 2: bom dia/boa tarde/boa noite\nelse if (/(bom\\s*dia+|boa\\s*tarde+|boa\\s*noite+)/.test(msg)) {\n  if (/bom\\s*dia+/.test(msg)) {\n    respostas.push(\"☀️ Bom dia! Bem-vindo(a) ao ESTABELECIMENTO.\");\n  } else if (/boa\\s*tarde+/.test(msg)) {\n    respostas.push(\"🌤️ Boa tarde! Bem-vindo(a) ao ESTABELECIMENTO.\");\n  } else if (/boa\\s*noite+/.test(msg)) {\n    respostas.push(\"🌙 Boa noite! Bem-vindo(a) ao ESTABELECIMENTO.\");\n  }\n}\n\n// Caso nenhuma saudação encontrada\nelse {\n  respostas.push(\"Olá! Bem-vindo(a) ao ESTABELECIMENTO.\");\n}\n\nreturn [{ respostas }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        -576
+      ],
+      "id": "5316aadb-b9bd-4dfc-9a34-9c686f92602c",
+      "name": "responde o comprimento"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "numberID",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.respostas[0] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        -576
+      ],
+      "id": "c8660c39-6be8-4067-8a35-398df35f5f6c",
+      "name": "envia resposta",
+      "webhookId": "44422954-a55c-4179-a4a3-25ceb51f1b11"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0/numberID/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"Me diga, no que posso lhe ajudar?\"\n    },\n    \"body\": {\n      \"text\": \"Escolha uma das opções abaixo para que eu possa te atender da melhor forma:\\n\\n- 📋 Meus Pedidos: veja o status dos pedidos já realizados.\\n- 🛒 Procurar Produto: encontre um produto ou serviço específico.\\n- 🆘 Preciso de Ajuda: fale com um atendente ou tire dúvidas rapidamente.\"\n    },\n    \"footer\": {\n      \"text\": \"Seu assistente digital do ESTABELECIMENTO\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"btn_meus_pedidos\",\n            \"title\": \"📋 Meus Pedidos\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"btn_procurar_produto\",\n            \"title\": \"🛒 Procurar Produto\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"btn_preciso_ajuda\",\n            \"title\": \"🆘 Preciso de Ajuda\"\n          }\n        }\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2032,
+        -368
+      ],
+      "id": "a1eff287-7a70-4c22-8886-153dbba94ffe",
+      "name": "envia o menu"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "btn_meus_pedidos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "aeeb2958-b35d-498c-8455-e94cf2ea1abd"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eed4cb6f-1534-484d-941a-04dbc7214d5a",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "btn_procurar_produto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3b252292-db70-43c8-9f03-a5ef7ef00951",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "btn_preciso_ajuda",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fb12d746-04c2-47ba-99ee-afbf2f416fd6",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].interactive.button_reply.id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        112
+      ],
+      "id": "d58aed0b-a466-4477-8769-0c249920337b",
+      "name": "menu",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v23.0/numberID/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $item(\"0\").$node[\"WhatsApp Trigger\"].json[\"contacts\"][\"0\"][\"wa_id\"] }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"header\": {\n      \"type\": \"text\",\n      \"text\": \"📋 Seus Pedidos\"\n    },\n    \"body\": {\n      \"text\": \"{{$json.mensagem}}\"\n    },\n    \"footer\": {\n      \"text\": \"Selecione uma opção abaixo para continuar:\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"btn_menu_principal\",\n            \"title\": \"Voltar\"\n          }\n        }\n      ]\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2560,
+        -32
+      ],
+      "id": "88b61f8c-950a-4a02-a683-ceffa00ff87b",
+      "name": "lista pedidos"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "numberID",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "=certo, o que você procura?",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        144
+      ],
+      "id": "b76746e7-e021-4caa-8901-28dfc0d65a1a",
+      "name": "inicia atendimento com agente",
+      "webhookId": "44422954-a55c-4179-a4a3-25ceb51f1b11"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "numberID",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "=ok, qual a sua dúvida??",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        352
+      ],
+      "id": "25acd953-dbff-486d-b5e5-51415b3b65e6",
+      "name": "encaminha para atendemento com agente",
+      "webhookId": "44422954-a55c-4179-a4a3-25ceb51f1b11"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega o output do node anterior\nconst raw = $json.output;\n\n// Procura blocos JSON delimitados por ```json ... ```\nconst matches = [...raw.matchAll(/```json([\\s\\S]*?)```/g)];\n\nlet merged = {};\n\nif (matches.length > 0) {\n    // Caso tenha blocos com ```json ... ```\n    for (const match of matches) {\n        const jsonString = match[1].trim();\n        try {\n            const parsed = JSON.parse(jsonString);\n            merged = { ...merged, ...parsed };\n        } catch (error) {\n            throw new Error('Falha ao parsear JSON do bloco: ' + error.message + '\\nJSON: ' + jsonString);\n        }\n    }\n} else {\n    // Caso não tenha blocos, tenta parsear direto o conteúdo\n    try {\n        merged = JSON.parse(raw);\n    } catch (error) {\n        throw new Error('Falha ao parsear JSON direto: ' + error.message + '\\nRaw: ' + raw);\n    }\n}\n\n// Retorna dados normalizados\nreturn [\n    {\n        json: {\n            resposta: merged.resposta || \"\",\n            pedido: merged.pedido || {},\n            itens: (merged.pedido && merged.pedido.itens) || [],\n            valor_total: merged.valortotal || merged.valor_total || 0,\n            pagamento: merged.formadepagamento || merged.pagamento || null,\n            endereco: merged.endereco || null,\n            jsonContext: merged.jsonContext || {},\n            finalizado: merged.finalizado || false\n        }\n    }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        960
+      ],
+      "id": "f050d713-3787-4514-b894-3482b65b89e8",
+      "name": "formata resposta"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e3bf6676-f109-4993-8a71-bbfed1c0bb09",
+              "leftValue": "={{ $json.finalizado }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2544,
+        960
+      ],
+      "id": "3e9b3a76-de38-497a-b9b6-700b7b085e29",
+      "name": "pedido finalizado?"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "numberID",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "Boa! Assim que seu pedido ficar pronto iremos enviar-lo!\n\nAgradecemos a preferencia\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2752,
+        912
+      ],
+      "id": "9d94e878-022c-4d9a-ade9-b5516489f02f",
+      "name": "agradece e finaliza atendimento",
+      "webhookId": "44422954-a55c-4179-a4a3-25ceb51f1b11"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "numberID",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.resposta }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2752,
+        1104
+      ],
+      "id": "03e67101-975a-489d-9571-f2f53d05a432",
+      "name": "mensagens do agente",
+      "webhookId": "44422954-a55c-4179-a4a3-25ceb51f1b11"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        928
+      ],
+      "id": "d30b24b1-2c1e-4a64-8181-5e9329c2e126",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1696,
+        464
+      ],
+      "id": "a867b53c-efa5-4da0-8985-bfa6ea6119d1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "numberID",
+        "recipientPhoneNumber": "={{ $('HTTP Request - Get Many Rows').item.json.wa_id.toString() }}",
+        "textBody": "Encerramos este atendimento por falta de resposta. Caso precise, é só nos chamar novamente. 😊",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        48,
+        496
+      ],
+      "id": "7454f257-924e-4225-bfdb-c6a14d323f07",
+      "name": "envia mensagem de finalização",
+      "webhookId": "44422954-a55c-4179-a4a3-25ceb51f1b11"
+    },
+    {
+      "parameters": {
+        "content": "# finalizar por falta de resposta",
+        "height": 368,
+        "width": 1872,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1728,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "e43c2a9a-445e-4894-9652-4017d90323ee",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# cria os embedded",
+        "height": 576,
+        "width": 1296,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -896,
+        848
+      ],
+      "typeVersion": 1,
+      "id": "eefab30d-3bc2-4ffe-8170-d19ad041d547",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# triggerwhatsapp",
+        "height": 704,
+        "width": 2928,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2320,
+        -352
+      ],
+      "typeVersion": 1,
+      "id": "368986a7-738d-437c-800b-30880bc00a59",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# saudação",
+        "height": 480,
+        "width": 864,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1312,
+        -672
+      ],
+      "typeVersion": 1,
+      "id": "a910ec9c-1356-4486-8916-4a658492718a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# menu",
+        "height": 608,
+        "width": 1152,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1456,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "1936c65f-9eac-4c7c-899b-554fe8c3325d",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# agente de ia",
+        "height": 800,
+        "width": 1536
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1568,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "f54ef9ff-3170-4bc9-8ef2-9462093589c5",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega todos os itens do node anterior\nconst pedidos = $items(\"Get many rows1\"); // substitua pelo nome do seu node de origem\n\n// Array para armazenar mensagens\nlet mensagens = [];\n\n// Itera pelos itens\nfor (let item of pedidos) {\n  const pedido = item.json; // pega o json de cada item\n  const data = new Date(pedido.updated_at).toLocaleString('pt-BR');\n  const valor = pedido.valor_pedido.toFixed(2);\n\n  // Use \\\\n para que o WhatsApp interprete como quebra de linha\n  mensagens.push(`📅 Pedido em: ${data}\\\\n💰 Valor: R$ ${valor}`);\n}\n\n// Junta todas as mensagens com duas quebras de linha\nconst mensagemFinal = mensagens.join('\\\\n\\\\n');\n\n// Retorna como único item\nreturn [\n  {\n    json: {\n      mensagem: mensagemFinal\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        -32
+      ],
+      "id": "cb6de3c5-8142-4b86-a5c6-1107b7527025",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "=Authorization",
+              "value": "=Bearer {{ $item(\"0\").$node[\"If\"].json[\"access_token\"] }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"wa_id\": \"{{ $item(\"0\").$node[\"WhatsApp Trigger\"].json[\"contacts\"][0][\"wa_id\"] }}\",\n  \"nome\": \"{{ $item(\"0\").$node[\"WhatsApp Trigger\"].json[\"contacts\"][0][\"profile\"][\"name\"] }}\",\n  \"status\": \"atendendo\",\n  \"commerce_id\": \"\",\n  \"updated_at\": \"{{ new Date(Date.now() - (3*60*60*1000)).toISOString() }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1728,
+        -576
+      ],
+      "id": "2615a47c-94c1-4307-a705-d7dde5756394",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "commerce_tokens",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "commerce_id",
+              "keyValue": ""
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        -208
+      ],
+      "id": "96c41456-ceea-44cc-be7f-1dacb4c8f853",
+      "name": "Get a row"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d3c8d423-fb4a-433b-bf45-c8030cc4d219",
+              "leftValue": "={{ $json.expires_at }}",
+              "rightValue": "={{ new Date() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -624,
+        -208
+      ],
+      "id": "e26d56fd-7193-42c6-92a9-2885820ce2c5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ywantzjpugtoahxkadii.supabase.co/auth/v1/token?grant_type=password",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"email\": \"emial-auth\",\n  \"password\": \"senha-auth\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        0
+      ],
+      "id": "4a5b71db-55ef-4a03-a455-0fab3bcfa889",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "commerce_tokens",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "commerce_id",
+              "condition": "eq",
+              "keyValue": ""
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "access_token",
+              "fieldValue": "={{ $json.access_token }}"
+            },
+            {
+              "fieldId": "refresh_token",
+              "fieldValue": "={{ $json.refresh_token }}"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ new Date($json[\"expires_at\"] * 1000).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "75d293a2-4aaa-4003-b98c-a16efd06d87c",
+      "name": "Update a row"
+    },
+    {
+      "parameters": {
+        "url": "=https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders?wa_id=eq.{{ $item(\"0\").$node[\"WhatsApp Trigger\"].json[\"contacts\"][\"0\"][\"wa_id\"] }}&status=eq.atendendo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $item(\"0\").$node[\"If\"].json[\"access_token\"] }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        -16
+      ],
+      "id": "29646c66-9018-478b-aba8-ff47b7ee9558",
+      "name": "pega usuario",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders?status=eq.atendendo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -592,
+        496
+      ],
+      "id": "3f85a4ad-b7de-47c3-b059-6569f068eea2",
+      "name": "HTTP Request - Get Many Rows"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bdd3e0bf-f669-4466-9d37-6fa50ba88cb1",
+              "name": "access_token",
+              "value": "={{ $json.access_token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        -96
+      ],
+      "id": "4c6e2b9c-acaa-4bd0-a5a0-df48d3b98b40",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d3c8d423-fb4a-433b-bf45-c8030cc4d219",
+              "leftValue": "={{ $json.expires_at }}",
+              "rightValue": "={{ new Date() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1328,
+        480
+      ],
+      "id": "4aef28a8-df11-49d1-9ef0-c70010fdf4b2",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ywantzjpugtoahxkadii.supabase.co/auth/v1/token?grant_type=password",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"email\": \"emial-auth\",\n  \"password\": \"senha-auth\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1152,
+        608
+      ],
+      "id": "c4671a83-7efe-4c90-b005-ff3db573b80c",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "commerce_tokens",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "commerce_id",
+              "condition": "eq",
+              "keyValue": ""
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "access_token",
+              "fieldValue": "={{ $json.access_token }}"
+            },
+            {
+              "fieldId": "refresh_token",
+              "fieldValue": "={{ $json.refresh_token }}"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ new Date($json[\"expires_at\"] * 1000).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        608
+      ],
+      "id": "3663303d-2296-4928-8fb0-54424eb7e3fa",
+      "name": "Update a row1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bdd3e0bf-f669-4466-9d37-6fa50ba88cb1",
+              "name": "access_token",
+              "value": "={{ $json.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "8c1e44a5-7666-4fcf-8a66-60feb1f67c40",
+              "name": "",
+              "value": "={{ new Date().toLocaleTimeString(\"pt-BR\", { timeZone: \"America/Sao_Paulo\" }) }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -832,
+        432
+      ],
+      "id": "a6984881-3074-4b73-921f-69acfcf9c8cc",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "commerce_tokens",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "commerce_id",
+              "keyValue": ""
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        464
+      ],
+      "id": "6742f1b5-d704-42eb-9549-5ff912e7f424",
+      "name": "Get a row1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst THIRTY_MINUTES = 30 * 60 * 1000; // 30 minutos\n\n// Hora atual em SP\nconst now = new Date(); // hora atual UTC, ok para cálculo\n\nconst result = items.map(item => {\n  const updatedAt = item.json.updated_at;\n  if (!updatedAt) return null;\n\nconst updated = new Date(updatedAt);\n  updated.setHours(updated.getHours() + 3);\n  const diff = now - updated;\n\n  return {\n    json: {\n      ...item.json,\n      updated_time: updated.toLocaleTimeString(\"pt-BR\", { timeZone: \"America/Sao_Paulo\" }),\n      now_time: now.toLocaleTimeString(\"pt-BR\", { timeZone: \"America/Sao_Paulo\" }),\n      diff_ms: diff,\n      passou_30_minutos: diff >= THIRTY_MINUTES\n    }\n  };\n}).filter(i => i && i.json.passou_30_minutos);\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        496
+      ],
+      "id": "48dcacae-9bad-4619-8fbe-248ee1fed150",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders?id=eq.{{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer  {{ $('Edit Fields1').item.json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -176,
+        496
+      ],
+      "id": "3fe836c3-7bc5-433d-857f-817a49b099c7",
+      "name": "HTTP Request - Delete Rows1"
+    },
+    {
+      "parameters": {
+        "url": "=https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders?\nwa_id=eq.{{ $item(\"0\").$node[\"WhatsApp Trigger\"].json[\"contacts\"][\"0\"][\"wa_id\"] }}&\nstatus=eq.finalizado",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $item(\"0\").$node[\"If\"].json[\"access_token\"] }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2064,
+        -16
+      ],
+      "id": "27f639f3-53b3-4a73-8bb6-d951c9122112",
+      "name": "Get many rows1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders?wa_id=eq.{{ $json.contacts[0].wa_id }}&status=eq.atendendo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "=Authorization",
+              "value": "=Bearer {{ $item(\"0\").$node[\"If\"].json[\"access_token\"] }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"pedido\": {{ JSON.stringify($item(0).$node[\"formata resposta\"].json[\"pedido\"]) }},\n  \"valor_pedido\": {{ $item(0).$node[\"formata resposta\"].json[\"valor_total\"] }},\n  \"forma_de_pagamento\": {{ JSON.stringify($('formata resposta').item.json.pagamento?.[0] || null) }},\n  \"context_message\": {{ JSON.stringify($item(0).$node[\"formata resposta\"].json[\"jsonContext\"]) }},\n  \"endereco\": {{ JSON.stringify($item(0).$node[\"formata resposta\"].json[\"endereco\"]) }},\n  \"updated_at\": \"{{$now.setZone('America/Sao_Paulo').toFormat('yyyy-MM-dd HH:mm:ss')}}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2944,
+        1104
+      ],
+      "id": "14b485ab-3b22-420c-af4d-70c49315f674",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders?wa_id=eq.{{ $item(\"0\").$node[\"agradece e finaliza atendimento\"].json[\"contacts\"][\"0\"][\"wa_id\"] }}&status=eq.atendendo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "=Authorization",
+              "value": "=Bearer {{ $item(\"0\").$node[\"If\"].json[\"access_token\"] }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"aberto\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2960,
+        928
+      ],
+      "id": "6e623567-7b74-483b-90e9-58f184a887c7",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://845524a2d311.ngrok-free.app/asr",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "audio_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1328,
+        -192
+      ],
+      "id": "3b0ce03f-7c03-48d2-888a-b010436df646",
+      "name": "HTTP Request9"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v16.0/{{ $json.messages[0].audio.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1712,
+        -192
+      ],
+      "id": "b3905e90-3739-4085-9b49-41ea847b8878",
+      "name": "download whatsapp 1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpBearerAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1536,
+        -192
+      ],
+      "id": "cf247b58-cac8-4744-adf8-096f0b546c63",
+      "name": "for binary1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "40fd1c8a-f48d-4685-8713-454e1f1a98e9",
+              "leftValue": "={{ $json.messages[0].audio }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2112,
+        64
+      ],
+      "id": "6d968641-36e8-4a00-9006-05ea604b3cb5",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e398adfe-624f-4ab6-95ae-6f10e2fbae2d",
+              "name": "mensagem",
+              "value": "={{ $json.data || $json.messages[0].text.body}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1072,
+        -112
+      ],
+      "id": "f4f56fa6-46e7-40b8-9989-184674bdfb3d",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "url": "=https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders?wa_id=eq.{{ $item(\"0\").$node[\"WhatsApp Trigger\"].json[\"contacts\"][\"0\"][\"wa_id\"] }}&status=eq.aberto",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        -64
+      ],
+      "id": "0b94226f-c6c6-477b-b218-6dedf5f07bbe",
+      "name": "pega usuario1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1344ff59-788b-4682-9109-68b952475ef7",
+              "leftValue": "={{ $item(\"0\").$node[\"pega usuario1\"].json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -64
+      ],
+      "id": "3e08cd9b-3bac-4112-95f5-344e8e52defb",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ywantzjpugtoahxkadii.supabase.co/auth/v1/token?grant_type=password",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"email\": \"emial-auth\",\n  \"password\": \"senha-auth\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        1920
+      ],
+      "id": "9f2b1f81-b069-48e9-9830-0a4b3a82c829",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://ywantzjpugtoahxkadii.supabase.co/rest/v1/orders?wa_id=eq.{{ $item(\"0\").$node[\"Fechar Pedido1\"].json[\"body\"][\"wa_id\"] }}&id=eq.{{ $item(\"0\").$node[\"Fechar Pedido1\"].json[\"body\"][\"id\"] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sua_apikey"
+            },
+            {
+              "name": "=Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"finalizado\",\n  \"updated_at\": \"{{ $now.setZone('America/Sao_Paulo').toFormat('yyyy-MM-dd HH:mm:ss') }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        1760
+      ],
+      "id": "493c9caf-7ecc-4445-bc4d-d979ab9c7af4",
+      "name": "HTTP Request10"
+    },
+    {
+      "parameters": {
+        "httpMethod": "PUT",
+        "path": "fechar-pedido",
+        "options": {
+          "allowedOrigins": "",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": ""
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, PUT, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        1808
+      ],
+      "id": "319bcafe-f76a-4211-ad41-8d8710d952e8",
+      "name": "Fechar Pedido1",
+      "webhookId": "941e2fa3-7a9f-40a7-8c2c-9e35ae67cfad"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d3c8d423-fb4a-433b-bf45-c8030cc4d219",
+              "leftValue": "={{ $json.expires_at }}",
+              "rightValue": "={{ new Date() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        1792
+      ],
+      "id": "74b64402-aa25-45a6-af61-a2beff872258",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "commerce_tokens",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "commerce_id",
+              "condition": "eq",
+              "keyValue": ""
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "access_token",
+              "fieldValue": "={{ $json.access_token }}"
+            },
+            {
+              "fieldId": "refresh_token",
+              "fieldValue": "={{ $json.refresh_token }}"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ new Date($json[\"expires_at\"] * 1000).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        1920
+      ],
+      "id": "53bf0817-ef16-4878-b9c4-b0fe5065bb72",
+      "name": "Update a row3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bdd3e0bf-f669-4466-9d37-6fa50ba88cb1",
+              "name": "access_token",
+              "value": "={{ $json.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "8c1e44a5-7666-4fcf-8a66-60feb1f67c40",
+              "name": "",
+              "value": "={{ new Date().toLocaleTimeString(\"pt-BR\", { timeZone: \"America/Sao_Paulo\" }) }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        1744
+      ],
+      "id": "596383e6-242e-4839-b792-d1ac49ffd6e1",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "commerce_tokens",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "commerce_id",
+              "keyValue": ""
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        1776
+      ],
+      "id": "9668a20b-09b0-4810-a6a0-23399e006a40",
+      "name": "Get a row3"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "numberID",
+        "recipientPhoneNumber": "={{ String($item(\"0\").$node[\"HTTP Request10\"].json[\"wa_id\"]) }}",
+        "textBody": "Oba, seu pedido saiu para entrega!\n\nFique atento, chegaremos a qualquer momento!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        704,
+        1792
+      ],
+      "id": "1c24d16f-5e67-4e60-b056-f309e23f0909",
+      "name": "envia mensagem de finalização1",
+      "webhookId": "44422954-a55c-4179-a4a3-25ceb51f1b11"
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "formata resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "main": [
+        []
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trata casos de interação e status": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "envia o menu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "menu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "responde o comprimento": {
+      "main": [
+        [
+          {
+            "node": "envia resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envia resposta": {
+      "main": [
+        [
+          {
+            "node": "envia o menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envia o menu": {
+      "main": [
+        []
+      ]
+    },
+    "menu": {
+      "main": [
+        [
+          {
+            "node": "Get many rows1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "inicia atendimento com agente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "encaminha para atendemento com agente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "lista pedidos": {
+      "main": [
+        []
+      ]
+    },
+    "inicia atendimento com agente": {
+      "main": [
+        []
+      ]
+    },
+    "encaminha para atendemento com agente": {
+      "main": [
+        []
+      ]
+    },
+    "formata resposta": {
+      "main": [
+        [
+          {
+            "node": "pedido finalizado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pedido finalizado?": {
+      "main": [
+        [
+          {
+            "node": "agradece e finaliza atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "mensagens do agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agradece e finaliza atendimento": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mensagens do agente": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "lista pedidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "responde o comprimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pega usuario": {
+      "main": [
+        [
+          {
+            "node": "trata casos de interação e status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Get Many Rows": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "pega usuario1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Update a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Get Many Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Delete Rows1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Delete Rows1": {
+      "main": [
+        [
+          {
+            "node": "envia mensagem de finalização",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request9": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "download whatsapp 1": {
+      "main": [
+        [
+          {
+            "node": "for binary1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "for binary1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "download whatsapp 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pega usuario1": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [],
+        [
+          {
+            "node": "pega usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "Update a row3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request10": {
+      "main": [
+        [
+          {
+            "node": "envia mensagem de finalização1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fechar Pedido1": {
+      "main": [
+        [
+          {
+            "node": "Get a row3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row3": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "65ba666636bd2cc228b70b8338fd5943343fbce2809278da6f3eb747179ed998"
+  }
+}
