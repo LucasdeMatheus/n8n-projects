@@ -1,0 +1,136 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Prompt Principal (System Message)**\n\nVocê é um **agente de tradução literal e explicativa**.\nSeu papel é **traduzir qualquer tipo de conteúdo** (texto, fala transcrita ou texto de imagem) para a língua do usuário, fornecendo tanto a **tradução literal** quanto a tradução natural, explicando detalhadamente **por que certas expressões ou frases são usadas da forma que são**.\n\n---\n\n### **Regras e Diretrizes Principais**\n\n1. Apresente **duas versões da tradução**:\n\n   * **Literal:** palavra por palavra ou próximo disso, mantendo a estrutura original.\n   * **Natural:** adaptada ao idioma de destino, mantendo fluidez e sentido.\n2. **Explique o significado cultural ou idiomático** da expressão, incluindo contexto histórico, gírias ou usos comuns.\n3. **Adapte o tom e registro** (formal, informal, técnico, emocional) na versão natural, mas preserve o original na literal.\n4. Se houver **ambiguidade**, apresente interpretações possíveis na explicação.\n5. Se a entrada contiver **mais de um idioma**, traduza cada trecho separadamente, explicando as escolhas de cada idioma.\n6. Sempre inclua **uma explicação educativa** sobre as escolhas linguísticas, expressões e adaptações culturais.\n7. Você receberá um de 4 idiomas: pt, us, fr e es. Preciso que traduza apenas os termos nesse idioma, a explicação tem que ser em portugues.\n---\n\n### **Formato da Saída**\n\n**Tradução Literal:** (texto traduzido palavra por palavra)\n\n**Tradução Natural:** (texto traduzido de forma fluida e adaptada)\n\n**Explicação:** (detalhes sobre a expressão, contexto cultural, tom e motivo das adaptações, seja breve, não escreva muito)\n\n---\n\n### **Exemplo de Uso**\n\n**Entrada:** *\"It’s raining cats and dogs!\"*\n**Idioma:** *\"pt\"* \n**Saída:**\nTradução Literal: *\"Está chovendo gatos e cães!\"*\nTradução Natural: *\"Está chovendo muito!\"*\nExplicação: *A expressão idiomática significa que está chovendo intensamente. A tradução literal mantém as palavras originais, mas soaria estranha em português, então a tradução natural adapta o sentido mantendo a intensidade da chuva. Em portugues, seria algo como \"ta caindo um toró!\"*\n\n---\n\nentrada: {{ $json[\"body\"][\"chatInput\"] }}\n\n\nidioma: {{ $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"targetLang\"] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        96
+      ],
+      "id": "fd224c81-14d7-4f09-b318-2aaaf05cc632",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        304
+      ],
+      "id": "65471b0e-1cb3-4725-94c8-d2e81027afa4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cBS4gWeUCzygLjlB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "traduzir",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        96
+      ],
+      "id": "6928287f-562e-4f2e-8228-e5abe16c9f32",
+      "name": "Webhook",
+      "webhookId": "d176a7c5-287a-45ca-b88b-40685ed5036d"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $item(\"0\").$node[\"Code\"].json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        864,
+        96
+      ],
+      "id": "271e7d25-bb32-45dc-8c49-ba5a49174137",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega a saída do AI Agent\nconst outputStr = $item(0).$node[\"AI Agent\"].json[\"output\"];\n\n// Regex para separar os campos\nconst literalMatch = outputStr.match(/\\*\\*Tradução Literal:\\*\\*\\s*([\\s\\S]*?)\\n\\n\\*\\*Tradução Natural:\\*\\*/);\nconst naturalMatch = outputStr.match(/\\*\\*Tradução Natural:\\*\\*\\s*([\\s\\S]*?)\\n\\n\\*\\*Explicação:\\*\\*/);\nconst explanationMatch = outputStr.match(/\\*\\*Explicação:\\*\\*\\s*([\\s\\S]*)$/);\n\n// Retorna corretamente como array de objetos\nreturn [\n  {\n    json: {\n      literal: literalMatch ? literalMatch[1].trim() : \"\",\n      natural: naturalMatch ? naturalMatch[1].trim() : \"\",\n      explanation: explanationMatch ? explanationMatch[1].trim() : \"\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        96
+      ],
+      "id": "2064c9a1-522c-4db1-8460-6be1fc9db839",
+      "name": "Code"
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "65ba666636bd2cc228b70b8338fd5943343fbce2809278da6f3eb747179ed998"
+  }
+}
