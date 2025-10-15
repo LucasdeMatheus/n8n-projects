@@ -56,7 +56,7 @@
     {
       "parameters": {
         "respondWith": "text",
-        "responseBody": "={{ $item(\"0\").$node[\"Code\"].json }}",
+        "responseBody": "={{ $node[\"Code\"].json ? [$node[\"Code\"].json] : [] }}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",
@@ -70,7 +70,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Pega a saída do AI Agent\nconst outputStr = $item(0).$node[\"AI Agent\"].json[\"output\"];\n\n// Regex para separar os campos\nconst literalMatch = outputStr.match(/\\*\\*Tradução Literal:\\*\\*\\s*([\\s\\S]*?)\\n\\n\\*\\*Tradução Natural:\\*\\*/);\nconst naturalMatch = outputStr.match(/\\*\\*Tradução Natural:\\*\\*\\s*([\\s\\S]*?)\\n\\n\\*\\*Explicação:\\*\\*/);\nconst explanationMatch = outputStr.match(/\\*\\*Explicação:\\*\\*\\s*([\\s\\S]*)$/);\n\n// Retorna corretamente como array de objetos\nreturn [\n  {\n    json: {\n      literal: literalMatch ? literalMatch[1].trim() : \"\",\n      natural: naturalMatch ? naturalMatch[1].trim() : \"\",\n      explanation: explanationMatch ? explanationMatch[1].trim() : \"\"\n    }\n  }\n];\n"
+        "jsCode": "// Use outro nome, ex: outputString\nconst outputString = $item(0).$node[\"AI Agent\"].json[\"output\"];\n\n// Divide os blocos pelo separador ---\nconst blocks = outputString.split(/---\\n/g);\n\n// Mapeia cada bloco para objeto\nconst result = blocks\n  .map(block => {\n    const literalMatch = block.match(/\\*\\*Tradução Literal:\\*\\*\\s*([\\s\\S]*?)\\n\\s*\\*\\*Tradução Natural:\\*\\*/i);\n    const naturalMatch = block.match(/\\*\\*Tradução Natural:\\*\\*\\s*([\\s\\S]*?)\\n\\s*\\*\\*Explicação:\\*\\*/i);\n    const explanationMatch = block.match(/\\*\\*Explicação:\\*\\*\\s*([\\s\\S]*)/i);\n\n    if (!literalMatch && !naturalMatch && !explanationMatch) return null;\n\n    return {\n      literal: literalMatch ? literalMatch[1].trim() : \"\",\n      natural: naturalMatch ? naturalMatch[1].trim() : \"\",\n      explanation: explanationMatch ? explanationMatch[1].trim() : \"\"\n    };\n  })\n  .filter(Boolean); // remove nulls\n\n// Retorna um único item com todas as traduções dentro de um array\nreturn [{\n  json: {\n    translations: result\n  }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
