@@ -1,0 +1,744 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é um gerador de questões educacionais para aprendizado de idiomas (como inglês ↔ português), voltado para usuários adultos com nível intermediário ou avançado.\nReceberá uma expressão, frase ou palavra, e deverá criar questões compatíveis com o modelo abaixo, no formato JSON.\n\n🧩 Regras:\n\nGere entre 3 e 5 questões por expressão.\n\nMisture os tipos:\n\n- Questões com alternativas (temAlternatives = true) → devem ter 4 opções (A–D).\n- Questões de Verdadeiro/Falso (temAlternatives = false) → apenas uma afirmação e a resposta numérica correspondente.\n\nOs temas das perguntas podem envolver:\n\n- Significado da expressão.\n- Uso correto em contexto.\n- Completar frases com coerência.\n- Interpretação de sentido figurado.\n\nAs alternativas devem ser realistas e desafiadoras, no estilo prova de concurso, evitando infantilização.\n\nA resposta correta deve ser representada por um índice numérico (0–3) correspondente à posição correta em alternativas.\n\nSempre produza **JSON puro e válido**, sem texto fora da estrutura.\n\n🧱 Estrutura de saída (compatível com a classe Question):\n{\n  \"expression\": \"texto recebido\",\n  \"questions\": [\n    {\n      \"description\": \"Pergunta aqui...\",\n      \"alternatives\": [\"A) ...\", \"B) ...\", \"C) ...\", \"D) ...\"],\n      \"correctAnswer\": 1,\n      \"explanation\": \"explicação da resposta\"\n    },\n    {\n      \"description\": \"Afirmação de verdadeiro ou falso...\",\n      \"alternatives\": [],\n      \"correctAnswer\": 0,\n      \"explanation\": \"explicação da resposta\"\n    }\n  ]\n}\n\n📥 Entrada esperada:\nexpressão: {{ $item(\"0\").$node[\"Webhook1\"].json[\"body\"][\"expressao\"] }}\n\n📤 Saída esperada (exemplo):\n\n{\n  \"expression\": \"Under the weather\",\n  \"questions\": [\n    {\n      \"description\": \"O que significa a expressão 'Under the weather'?\",\n      \"alternatives\": [\n        \"A) Estar muito animado.\",\n        \"B) Estar se sentindo mal ou doente.\",\n        \"C) Trabalhar ao ar livre.\",\n        \"D) Ficar preso na chuva.\"\n      ],\n      \"correctAnswer\": 1,\n      \"explanation\": \"A expressão 'under the weather' é usada para indicar que alguém está se sentindo doente ou indisposto.\"\n    },\n    {\n      \"description\": \"Complete a frase: I didn’t go to work today because I was feeling ________.\",\n      \"alternatives\": [\n        \"A) under the weather\",\n        \"B) on cloud nine\",\n        \"C) in the zone\",\n        \"D) over the moon\"\n      ],\n      \"correctAnswer\": 0,\n      \"explanation\": \"A opção correta é 'under the weather', pois expressa que a pessoa não foi trabalhar por estar se sentindo mal.\"\n    },\n    {\n      \"description\": \"A expressão 'Under the weather' significa estar com boa saúde.\",\n      \"alternatives\": [],\n      \"correctAnswer\": 0,\n      \"explanation\": \"A afirmação é falsa — 'Under the weather' indica o oposto, estar doente.\"\n    },\n    {\n      \"description\": \"Em qual das situações alguém poderia dizer 'I'm under the weather'?\",\n      \"alternatives\": [\n        \"A) Após ganhar uma promoção no trabalho.\",\n        \"B) Quando está cansado e gripado, sem disposição.\",\n        \"C) Quando está animado para viajar.\",\n        \"D) Depois de um treino bem-sucedido.\"\n      ],\n      \"correctAnswer\": 1,\n      \"explanation\": \"Usa-se 'I'm under the weather' quando se está se sentindo doente ou indisposto.\"\n    }\n  ]\n}\n\nGere sempre nesse formato JSON e nunca inclua explicações fora da estrutura.\n\ninput: {{ $item(\"0\").$node[\"Webhook1\"].json[\"body\"][\"expressao\"] }}\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -3280,
+        -288
+      ],
+      "id": "681dd41a-0986-4798-abde-a39142a2f990",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3424,
+        -80
+      ],
+      "id": "2940cf82-96a0-4cd5-9ddf-cc6491a45254",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cBS4gWeUCzygLjlB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "question",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3584,
+        -288
+      ],
+      "id": "2552730a-d13d-4908-893e-a7fc0975e9b4",
+      "name": "Webhook1",
+      "webhookId": "d176a7c5-287a-45ca-b88b-40685ed5036d"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $node[\"Code1\"].json ? [$node[\"Code1\"].json] : [] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -2720,
+        -288
+      ],
+      "id": "db0aa4c3-23e5-4eb6-978d-773b3017be46",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega a string do output do nó anterior\nconst outputString = $item(0).$node[\"AI Agent1\"].json[\"output\"];\n\n// Remove ```json e ``` caso existam\nconst cleaned = outputString.replace(/```json/g, '').replace(/```/g, '').trim();\n\n// Parseia a string JSON\nlet parsed;\ntry {\n    parsed = JSON.parse(cleaned);\n} catch (error) {\n    throw new Error(\"Erro ao parsear JSON do AI Agent: \" + error.message);\n}\n\n// Retorna apenas o objeto principal (sem o array wrapper se houver)\nreturn [{\n    json: parsed\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2928,
+        -288
+      ],
+      "id": "c32d33cd-fb63-4eea-bf8a-4eff1fe5624b",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Prompt Principal (System Message)**\n\nVocê é um **agente de tradução literal e explicativa**.\nSeu papel é **traduzir qualquer tipo de conteúdo** (texto, fala transcrita ou texto de imagem) para a língua do usuário, fornecendo tanto a **tradução literal** quanto a tradução natural, explicando detalhadamente **por que certas expressões ou frases são usadas da forma que são**.\n\n---\n\n### **Regras e Diretrizes Principais**\n\n1. Apresente **duas versões da tradução**:\n\n   * **Literal:** palavra por palavra ou próximo disso, mantendo a estrutura original.\n   * **Natural:** adaptada ao idioma de destino, mantendo fluidez e sentido.\n2. **Explique o significado cultural ou idiomático** da expressão, incluindo contexto histórico, gírias ou usos comuns.\n3. **Adapte o tom e registro** (formal, informal, técnico, emocional) na versão natural, mas preserve o original na literal.\n4. Se houver **ambiguidade**, apresente interpretações possíveis na explicação.\n5. Se a entrada contiver **mais de um idioma**, traduza cada trecho separadamente, explicando as escolhas de cada idioma.\n6. Sempre inclua **uma explicação educativa** sobre as escolhas linguísticas, expressões e adaptações culturais.\n7. Você receberá um de 4 idiomas: pt, us, fr e es. Preciso que traduza apenas os termos no idioma fornecido, a explicação tem que ser em portugues.\n8. Se houver erros de vocabulario ou gramatica, considere corrigir.\n---\n\n### **Formato da Saída**\n\n**Tradução Literal:** (texto traduzido palavra por palavra)\n\n**Tradução Natural:** (texto traduzido de forma fluida e adaptada)\n\n**Explicação:** (detalhes sobre a expressão, contexto cultural, tom e motivo das adaptações, seja breve, não escreva muito)\n\n---\n\n### **Exemplo de Uso**\n\n**Entrada:** *\"It’s raining cats and dogs!\"*\n**Idioma:** *\"pt\"* \n**Saída:**\nTradução Literal: *\"Está chovendo gatos e cães!\"*\nTradução Natural: *\"Está chovendo muito!\"*\nExplicação: *A expressão idiomática significa que está chovendo intensamente. A tradução literal mantém as palavras originais, mas soaria estranha em português, então a tradução natural adapta o sentido mantendo a intensidade da chuva. Em portugues, seria algo como \"ta caindo um toró!\"*\n\n\n**Retorne todas as informações em json:**\n**Entrada:** *\"Chutar o balde\"*\n**Idioma:** *\"en\"* \n[\n  {\n    \"expression\": \"Chutar o balde\",\n    \"literalTranslation\": \"Kick the bucket\",\n    \"naturalTranslation\": \"Give up completely; lose patience; throw in the towel.\",\n    \"explanation\": \"A expressão idiomática 'chutar o balde' significa desistir completamente de uma situação, projeto ou responsabilidade, muitas vezes por frustração ou cansaço extremo. A tradução literal mantém as palavras originais, enquanto a natural transmite o sentido figurado de desistência.\"\n  },{...}\n]\n\n---\n\nentrada: {{ $json[\"body\"][\"chatInput\"] }}\n\n\n**As traduções tem que ser feita para esse idioma:** {{ $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"targetLang\"] }}\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -3360,
+        -832
+      ],
+      "id": "ae498a4f-5ea2-4639-b735-a6bf3bb7d41b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3504,
+        -624
+      ],
+      "id": "69644feb-2c74-4c2c-9838-d4bd176711c9",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cBS4gWeUCzygLjlB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "traduzir",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3712,
+        -848
+      ],
+      "id": "46f6dd84-d3b0-431b-8ec5-0a6d657709ba",
+      "name": "Webhook",
+      "webhookId": "d176a7c5-287a-45ca-b88b-40685ed5036d"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $node[\"Code\"].json ? [$node[\"Code\"].json] : [] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -2800,
+        -832
+      ],
+      "id": "2ab9b36b-932c-4c06-95bf-a56667ed69d0",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega o output do nó AI Agent\nconst outputString = $item(0).$node[\"AI Agent\"].json[\"output\"];\n\n// Remove os marcadores ```json e ``` caso existam\nconst cleanString = outputString.replace(/```json|```/g, \"\").trim();\n\n// Tenta parsear como JSON\nlet translations = [];\ntry {\n  const parsed = JSON.parse(cleanString);\n\n  // Se for um array, usamos direto\n  if (Array.isArray(parsed)) {\n    translations = parsed.map(item => ({\n      literal: item.literalTranslation || \"\",\n      natural: item.naturalTranslation || \"\",\n      explanation: item.explanation || \"\",\n      expression: item.expression || \"\"\n    }));\n  }\n} catch (err) {\n  console.error(\"Erro ao parsear JSON do AI Agent:\", err);\n}\n\n// Retorna um único item com todas as traduções\nreturn [{\n  json: {\n    translations\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3008,
+        -832
+      ],
+      "id": "3fe1f42d-bd3b-4cf0-a0df-1cacd4d693f2",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": " https://aa2ea83fb7dd.ngrok-free.app/dialogue",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2224,
+        -176
+      ],
+      "id": "1059ee3f-fa11-4ede-9e65-0afc9c66e105",
+      "name": "HTTP Request",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é um professor de inglês que cria frases para aprendizado, com foco em vocabulário, pronúncia e contexto cultural americano.\n\nRegras:\n\nSempre considere que o usuário é o cliente / pessoa que responde.\n\nO campo \"answer\" deve ser sempre o que o usuário fala.\n\nO campo \"ask\" deve ser sempre o que a outra pessoa responde (atendente, amigo, funcionário, etc.).\n\nGere frases simples e naturais do cotidiano americano, sem formalidade escolar.\n\nUse expressões comuns e conectadas, com pronúncia simplificada (junções e trocas como 'water' → 'warrer').\n\nSão dialogos cotidiano, então não gere tantas, apenas uma quantidade boa para o contexto.(2 - 5 dialogos)\n\nEvite repetir contextos listados em {{ $json.contextos }}.\n\nFaça um diálogo completo, quantas linhas forem necessárias.\n\nCampo explanation:\n\nExplique o significado idiomático completo da resposta (answer).\n\nExplique o tom da resposta (formal, informal, amigável, sarcástico, etc.).\n\nExplique por que a resposta é natural nesse contexto.\n\nDê um exemplo equivalente em português (se houver).\n\nA explicação deve cobrir toda a frase, não apenas uma palavra.\n\nFormato do JSON que o HTTP deve receber, exatamente nesse formato:\n\n{\n    \"language\": 0,\n    \"ask\": \"Hey, what's up?\",\n    \"translationAsk\": \"Ei, e aí? (êi, wasup?)\",\n    \"answer\": \"Not much, just chillin'.\",\n    \"translationAnswer\": \"Nada demais, só de boa. (nara dmaiz, só dboa)\",\n    \"explanation\": \"'Chillin'' é uma gíria informal para 'relaxando', muito usada entre amigos.\",\n    \"context\": \"Cumprimentando um amigo\"\n}\n\n\nInstruções de envio:\n\nEnvie quantas requisições POST precisar para gerar um diálogo completo para o HTTP Tools.\n\nUse o campo json e coloque os diálogos gerados, faça o POST para cada um.\n\nRetorne apenas logs curtos de confirmação, ex.: Enviado: Cumprimentando um amigo.\n\nNão retorne o JSON completo, apenas a confirmação.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1680,
+        -176
+      ],
+      "id": "bb4f2d63-a11e-4644-972d-58f166446584",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        48
+      ],
+      "id": "0a03cd55-a1f7-457b-be8a-2a6422443642",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cBS4gWeUCzygLjlB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recebe os items de entrada\nconst input = items.map(i => i.json);\n\n// Extrai todos os contextos, mantendo null quando não houver\nconst contextosRaw = input.map(item => item.context || null);\n\n// Filtra duplicados e nulls (opcional, se quiser manter nulls, remova o filtro)\nconst contextosUnicos = [...new Set(contextosRaw)].filter(c => c !== null);\n\n// Retorna como JSON\nreturn [\n    { json: { contextos: contextosUnicos } }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2016,
+        -176
+      ],
+      "id": "f6c2ed9c-2903-4624-94ef-5a6f36931571",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use para salvar cada parte do dialogo",
+        "method": "POST",
+        "url": " https://aa2ea83fb7dd.ngrok-free.app/dialogue",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('JSON', ``, 'json') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -1488,
+        48
+      ],
+      "id": "1d6cc0f1-7fd5-48a2-a46f-b19d93f9e03d",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você deve processar os dados de transcrição em JSON bruto do Whisper para a música: [{{ $('Read/Write Files from Disk').item.json.fileName }}].\n\nCorreção e Otimização: Corrija o campo \"text\" de cada segmento do JSON bruto utilizando a letra oficial da música abaixo para máxima precisão, mantendo o idioma original (Inglês).\n\nTradução: Traduza o texto corrigido para um Português claro, natural e semanticamente correto.\n\nSegmentação: Usando o tempo recebido no JSON bruto do Whisper, divida os versos em segmentos menores, respeitando o tempo correto e a divisão natural da música, instanciando-os separadamente.\n\nSaída Final (Formato Estrito): Gere a saída como um único objeto JSON (array de segmentos), **sem qualquer texto introdutório ou explicativo**.\n\nFormato JSON esperado:\n\n[\n  {\n    \"name\": \"{{ $('Read/Write Files from Disk').item.json.fileName }}\",\n    \"musicUrl\": null,\n    \"transcription\": \"[{ \\\n      \\\"id\\\": (int) índice do segmento, \\\n      \\\"verso\\\": (string) transcrição corrigida em inglês, \\\n      \\\"verso_translate\\\": (string) tradução para português, \\\n      \\\"start\\\": (float) tempo inicial do segmento, \\\n      \\\"end\\\": (float) tempo final do segmento \\\n    }]\",  // OBS: essa lista deve ser uma string JSON válida\n    \"TYPE\": \"ACAPELLA\"\n  }\n]\n\nDados fornecidos para correção:\n\n- JSON bruto do Whisper: [{{ $json.data }}]\n\n- Letra oficial da música para correção: {{ $item(\"0\").$node[\"HTTP Request4\"].json[\"lyrics\"] }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        176,
+        -400
+      ],
+      "id": "fd669542-177f-435f-ab9e-fdbdb1808255",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://6e39d1542305.ngrok-free.app/asr",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "encode",
+              "value": "true"
+            },
+            {
+              "name": "task",
+              "value": "transcribe"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            },
+            {
+              "name": "output",
+              "value": "json"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "audio_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        -432
+      ],
+      "id": "a41a2148-54ea-4232-8f35-542e188d5645",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Code4').item.json.fileName }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -416
+      ],
+      "id": "73327b90-9bac-4e9e-af6f-12cd6fce027e",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "command": "ls /home/node/numeros/*.wav"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        -416
+      ],
+      "id": "ec5f9677-ce5b-4566-9542-b888417706ca",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "jsCode": "// A saída do nó anterior (Execute Command) estará no campo stdout.\nconst commandOutput = $input.item.json.stdout; \n\n// 1. Limpa o nome do arquivo de quebras de linha e espaços em branco.\nconst fullFileName = commandOutput.trim();\n\n// 2. Extrai APENAS o nome do arquivo, removendo a extensão (.wav).\n// A regex (\\.wav)$ busca a string \".wav\" no final do nome e a substitui por uma string vazia.\nconst rawName = fullFileName.replace(/(\\.wav)$/i, '');\n\n// 3. Retorna os dois valores necessários.\nreturn [{\n  json: {\n    // Exemplo: \"Juice WRLD - All Girls Are The Same.wav\"\n    fileName: fullFileName, \n    \n    // Exemplo: \"Juice WRLD - All Girls Are The Same\"\n    rawName: rawName\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        -416
+      ],
+      "id": "eb802f65-102d-483c-af81-8b8f77c49a6f",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        48,
+        -192
+      ],
+      "id": "78676e0b-5714-4952-991c-47eb7b3cfd35",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vXIdmiWinDPG8mvV",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $item(0).$node[\"AI Agent2\"].json[\"output\"];\n\n// Remove formatações tipo ```json ou ```\nlet clean = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .trim();\n\n// Corrigir apóstrofos simples dentro da string transcription para evitar erro de escape\n// Só na string da transcription, para não alterar outras partes\n\n// Para isso, uma forma simples é localizar a propriedade transcription e aplicar replace no valor dela\n// Como é uma string enorme, podemos tentar algo assim:\n\nconst transcriptionMatch = clean.match(/(\"transcription\"\\s*:\\s*\")([\\s\\S]*?)(\")(,|\\n)/);\nif (transcriptionMatch) {\n  let transcriptionStr = transcriptionMatch[2];\n  // Escapa apóstrofos simples não escapados (') dentro da string JSON\n  transcriptionStr = transcriptionStr.replace(/([^\\\\])'/g, \"$1\\\\'\");\n  // Reconstroi a string completa\n  clean = clean.replace(transcriptionMatch[0], `\"transcription\":\"${transcriptionStr}\"${transcriptionMatch[4]}`);\n}\n\nlet data;\ntry {\n  data = JSON.parse(clean);\n} catch (error) {\n  throw new Error(\"O conteúdo não é um JSON válido: \" + error.message + \"\\n\\nConteúdo limpo:\\n\" + clean);\n}\n\n// Se for um array, transforma em múltiplos itens; se for objeto, retorna um só\nif (Array.isArray(data)) {\n  return data.map(d => ({ json: d }));\n} else {\n  return [{ json: data }];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -400
+      ],
+      "id": "c5dc467d-f7c2-4bce-9507-f9ef049ebcb1",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://cf83d321c20d.ngrok-free.app/music",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($item(\"0\").$node[\"Code5\"].json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        736,
+        -400
+      ],
+      "id": "6b5506d2-9135-44c9-ad83-c913eebec804",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "https://api.lyrics.ovh/v1/Juice%20Wrld/All%20Girls%20Are%20The%20Same",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -640,
+        -384
+      ],
+      "id": "17898906-4a09-452f-9fd0-b9c21ea57fdc",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "url": "https://aa2ea83fb7dd.ngrok-free.app/dialogue",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1088,
+        80
+      ],
+      "id": "71bf65ec-35da-4f64-8725-41bc3d896619",
+      "name": "HTTP Request (POST JSON)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Você é um professor de inglês que cria frases para aprendizado, com foco em vocabulário, pronúncia e contexto cultural americano.\n\nRegras:\n- Gere frases simples e naturais do cotidiano americano, sem formalidade escolar.\n- Use expressões comuns e conectadas, com pronúncia simplificada (junções e trocas como 'water' → 'warrer').\n- Gere várias linhas de diálogo (ask/answer) de um mesmo contexto.\n- Evite repetir contextos listados em {{ $json.contextos }}.\n\nCada diálogo deve ter este formato JSON:\n{\n  \"language\": 0,\n  \"ask\": \"Hey, what's up?\",\n  \"translationAsk\": \"Ei, e aí? (êi, wasup?)\",\n  \"answer\": \"Not much, just chillin'.\",\n  \"translationAnswer\": \"Nada demais, só de boa. (nara dmaiz, só dboa)\",\n  \"explanation\": \"'Chillin'' é uma gíria informal para 'relaxando', muito usada entre amigos.\",\n  \"context\": \"Cumprimentando um amigo\"\n}\n\nPara cada diálogo gerado:\n- Use o tool `httpRequest` configurado para enviar automaticamente o JSON gerado para `https://aa2ea83fb7dd.ngrok-free.app/dialogue` com método POST e corpo JSON.\n- Retorne apenas logs curtos de confirmação, como: `Enviado: Cumprimentando um amigo`.\n\nNão retorne o JSON completo, apenas a confirmação de envio.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -544,
+        80
+      ],
+      "id": "dccd8247-a888-4c07-8ca3-19677c42f2c2",
+      "name": "AI Agent5"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        288
+      ],
+      "id": "64908f72-019d-4a4e-a1fc-10a595b08b40",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cBS4gWeUCzygLjlB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items.map(i => i.json);\nconst contextos = [...new Set(input.map(i => i.context).filter(Boolean))];\nreturn [{ json: { contextos } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        80
+      ],
+      "id": "c6b11377-35ad-4eb1-8068-b6b2b0448ad0",
+      "name": "Code6"
+    }
+  ],
+  "connections": {
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (POST JSON)": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "65ba666636bd2cc228b70b8338fd5943343fbce2809278da6f3eb747179ed998"
+  }
+}
