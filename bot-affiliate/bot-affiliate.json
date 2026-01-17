@@ -1,0 +1,350 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        16
+      ],
+      "id": "427a3b37-c97f-411e-a48f-1a1f71d3f117",
+      "name": "Webhook",
+      "webhookId": "8021c297-c164-443a-a819-875e56f1b92f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ca17b85b-c42e-4ec2-a6f0-cbb974b9082e",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8114ef6a-805e-4338-8642-df1b5a2b3c02",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7f0242a8-9e27-4116-a5e1-6d7d0dd99fbf",
+              "leftValue": "={{ $json.body.data.key.remoteJid }}",
+              "rightValue": "@g.us",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        16
+      ],
+      "id": "6e89212d-c4f0-43c4-a77f-78371ad67152",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://mercadolivre-api-afiliados.vercel.app/api/v1/resolve-link",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "link",
+              "value": "={{ $json.mercadoLivreUrl }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        -128
+      ],
+      "id": "564235c9-5044-4b69-a105-062ebc348771",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega a legenda da imagem\nconst caption = $input.first().json.body.data.message.imageMessage.caption;\n\n// Regex para pegar link do Mercado Livre\nconst regex = /(https?:\\/\\/(?:www\\.)?mercadolivre\\.com\\S+)/i;\n\n// Executa a busca\nconst match = caption.match(regex);\n\n// Loop padrão do n8n\nfor (const item of $input.all()) {\n  item.json.mercadoLivreUrl = match ? match[1] : null;\n}\n\nreturn $input.all();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        -80
+      ],
+      "id": "bbda35ba-49ff-42a2-83f1-6f46fb8897d6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://mercadolivre-api-afiliados.vercel.app/api/v1/affiliate-link",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "affiliate_id",
+              "value": "jj2549408"
+            },
+            {
+              "name": "product_url",
+              "value": "={{ $json.product_url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        -128
+      ],
+      "id": "429c9164-3224-41e8-80eb-031cdac95070",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mensagem original (caption)\nconst mensagem = $('Webhook').first().json.body.data.message.imageMessage.caption;\n\n// Link afiliado gerado\nconst linkAfiliado = $input.first().json.affiliate_link.short_url;\n\n// Regex para encontrar link do Mercado Livre\nconst regexML = /https?:\\/\\/(?:www\\.)?mercadolivre\\.com\\S+/i;\n\n// Substitui o link antigo pelo afiliado\nconst mensagemFinal = mensagem.replace(regexML, linkAfiliado);\n\n// Retorna no formato do n8n\nreturn [\n  {\n    json: {\n      mensagem: mensagemFinal\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -128
+      ],
+      "id": "5ab71268-c0bb-4314-b668-3c8aba5cde8d",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data;\n\n// Regex do Open Graph\nconst match = html.match(/property=\"og:image\"\\s+content=\"([^\"]+)\"/);\n\nreturn [\n  {\n    json: {\n      imageUrl: match ? match[1] : null\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        -144
+      ],
+      "id": "ad6b23ab-8592-4e9d-89c7-3555add62325",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $item(\"0\").$node[\"HTTP Request2\"].json[\"affiliate_link\"][\"short_url\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        912,
+        -128
+      ],
+      "id": "cd7b0528-b1ac-4cd2-b3fc-966954d1e5a5",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://0545983f90fc.ngrok-free.app/message/sendMedia/teste",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "E09A6B9F906B-495C-8A5B-FEAB9EA123FB"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid.replace('@g.us', '') }}\n"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Code1').item.json.mensagem }}"
+            },
+            {
+              "name": "media",
+              "value": "={{ $json.imageUrl }}"
+            },
+            {
+              "name": "mediatype",
+              "value": "=image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1648,
+        -144
+      ],
+      "name": "Enviar Imagem Evolution1",
+      "id": "fc84f912-f6b9-4ef7-9c7f-7ca242af929b"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $item(0).$node[\"HTTP Request3\"].json[\"data\"];\n\n// regex focada exatamente no <img> dentro da poly-card__portada\nconst regex = /<div class=\"poly-card__portada\">[\\s\\S]*?<img[^>]+src=\"([^\"]+)\"/i;\n\nconst match = html.match(regex);\n\nreturn [\n  {\n    imageUrl: match ? match[1] : null\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        -144
+      ],
+      "id": "8480279a-d32d-445c-a020-7784298a0c97",
+      "name": "Code3"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Imagem Evolution1": {
+      "main": [
+        []
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Enviar Imagem Evolution1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "65ba666636bd2cc228b70b8338fd5943343fbce2809278da6f3eb747179ed998"
+  }
+}
