@@ -1,0 +1,124 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        144
+      ],
+      "id": "e3561ada-ea22-4b8a-bf19-b84a6d35b91b",
+      "name": "Webhook",
+      "webhookId": "8021c297-c164-443a-a819-875e56f1b92f"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://de9f48e090f6.ngrok-free.app/message/sendText/test",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "B2F2BC9323C2-40C3-B417-ABF4507D2104"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.body.data.key.remoteJid.replace('@s.whatsapp.net','') }}\",\n  \"text\": \"yo yo yo yo, figurinha feita com sucessooooooo\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -80,
+        144
+      ],
+      "name": "figurinha criada",
+      "id": "36cdc10f-b15f-475f-8886-12dab9efc4b8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://de9f48e090f6.ngrok-free.app/message/sendSticker/test",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "B2F2BC9323C2-40C3-B417-ABF4507D2104"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}"
+            },
+            {
+              "name": "sticker",
+              "value": "={{ $('Webhook').item.json.body.data.message.base64 }}"
+            },
+            {
+              "name": "mediatype",
+              "value": "=stickerMessage"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        128,
+        144
+      ],
+      "name": "envia figurinha",
+      "id": "fdedc690-c23b-4d20-9b9e-492f999a8504"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "figurinha criada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "figurinha criada": {
+      "main": [
+        [
+          {
+            "node": "envia figurinha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "65ba666636bd2cc228b70b8338fd5943343fbce2809278da6f3eb747179ed998"
+  }
+}
