@@ -1,0 +1,92 @@
+version: "3.8"
+
+services:
+  # =========================
+  # EVOLUTION API
+  # =========================
+  evolution-api:
+    image: evoapicloud/evolution-api:latest
+    container_name: evolution_api
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - evolution_instances:/evolution/instances
+    networks:
+      - app-net
+
+  # =========================
+  # N8N
+  # =========================
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=postgres
+      - N8N_PORT=5678
+      - N8N_HOST=0.0.0.0
+      - NODE_ENV=production
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - postgres
+    networks:
+      - app-net
+
+  # =========================
+  # POSTGRESQL
+  # =========================
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: evolution
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-net
+
+  # =========================
+  # REDIS (Evolution usa)
+  # =========================
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-net
+
+# =========================
+# VOLUMES
+# =========================
+volumes:
+  postgres_data:
+  evolution_instances:
+  n8n_data:
+  redis_data:
+
+# =========================
+# NETWORK
+# =========================
+networks:
+  app-net:
+    driver: bridge
